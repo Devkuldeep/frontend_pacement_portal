@@ -1,0 +1,362 @@
+import React, { useState } from 'react';
+
+const StudentForm = () => {
+  const [formData, setFormData] = useState({
+    // Personal Information
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    gender: '',
+    dateOfBirth: '',
+    email: '',
+    mobile: '',
+    alternateContact: '',
+    currentAddress: {
+      street: '',
+      city: '',
+      state: '',
+      zipCode: '',
+    },
+    sameAsCurrentAddress: false,
+    permanentAddress: {
+      street: '',
+      city: '',
+      state: '',
+      zipCode: '',
+    },
+    // ... (other initial state fields as per your data)
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
+  };
+
+  const handleAddressCheckbox = (e) => {
+    const { checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      sameAsCurrentAddress: checked,
+      permanentAddress: checked ? { ...prev.currentAddress } : {
+        street: '',
+        city: '',
+        state: '',
+        zipCode: '',
+      }
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(formData);
+    // Handle form submission
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 space-y-8">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Student Registration Form</h2>
+
+      {/* Personal Information */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h3 className="text-xl font-semibold mb-4">Personal Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">First Name</label>
+            <input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Middle Name</label>
+            <input
+              type="text"
+              name="middleName"
+              value={formData.middleName}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Last Name</label>
+            <input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        {/* Current Address */}
+        <div className="mt-6">
+          <h4 className="text-lg font-medium mb-2">Current Address</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Street</label>
+              <input
+                type="text"
+                name="currentAddress.street"
+                value={formData.currentAddress.street}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">City</label>
+              <input
+                type="text"
+                name="currentAddress.city"
+                value={formData.currentAddress.city}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Same as Current Address Checkbox */}
+        <div className="mt-4">
+          <label className="inline-flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.sameAsCurrentAddress}
+              onChange={handleAddressCheckbox}
+              className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+            <span className="ml-2">Same as Current Address</span>
+          </label>
+        </div>
+
+        {/* Contact Information */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Mobile</label>
+            <input
+              type="tel"
+              name="mobile"
+              value={formData.mobile}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Submit Button */}
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default StudentForm;
+{/* Academic Information */}
+<div className="bg-white p-6 rounded-lg shadow-md mt-6">
+  <h3 className="text-xl font-semibold mb-4">Academic Information</h3>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Enrollment Number</label>
+      <input
+        type="text"
+        name="enrollmentNumber"
+        value={formData.enrollmentNumber}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Program</label>
+      <input
+        type="text"
+        name="program"
+        value={formData.program}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Branch</label>
+      <input
+        type="text"
+        name="branch"
+        value={formData.branch}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      />
+    </div>
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Year of Study</label>
+      <input
+        type="text"
+        name="yearOfStudy"
+        value={formData.yearOfStudy}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Current Semester</label>
+      <input
+        type="text"
+        name="currentSemester"
+        value={formData.currentSemester}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700">CGPA</label>
+      <input
+        type="number"
+        step="0.01"
+        name="cgpa"
+        value={formData.cgpa}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      />
+    </div>
+  </div>
+</div>
+
+{/* Academic History */}
+<div className="bg-white p-6 rounded-lg shadow-md mt-6">
+  <h3 className="text-xl font-semibold mb-4">Academic History</h3>
+  
+  {/* 10th Details */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700">10th Roll Number</label>
+      <input
+        type="text"
+        name="tenthRollNo"
+        value={formData.tenthRollNo}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700">10th Board</label>
+      <input
+        type="text"
+        name="tenthBoard"
+        value={formData.tenthBoard}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      />
+    </div>
+  </div>
+
+  {/* 12th Details */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700">12th Roll Number</label>
+      <input
+        type="text"
+        name="twelfthRollNo"
+        value={formData.twelfthRollNo}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700">12th Board</label>
+      <input
+        type="text"
+        name="twelfthBoard"
+        value={formData.twelfthBoard}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      />
+    </div>
+  </div>
+</div>
+
+{/* Skills and Documents */}
+<div className="bg-white p-6 rounded-lg shadow-md mt-6">
+  <h3 className="text-xl font-semibold mb-4">Skills and Documents</h3>
+  <div className="grid grid-cols-1 gap-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Technical Skills</label>
+      <textarea
+        name="technicalSkills"
+        value={formData.technicalSkills}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        rows="3"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Certifications</label>
+      <textarea
+        name="certifications"
+        value={formData.certifications}
+        onChange={handleInputChange}
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        rows="2"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Resume</label>
+      <input
+        type="file"
+        name="resume"
+        onChange={handleInputChange}
+        className="mt-1 block w-full"
+      />
+    </div>
+  </div>
+</div>
+
+{/* Declaration */}
+<div className="bg-white p-6 rounded-lg shadow-md mt-6">
+  <div className="flex items-center">
+    <input
+      type="checkbox"
+      name="declaration"
+      checked={formData.declaration}
+      onChange={handleInputChange}
+      className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+    />
+    <span className="ml-2 text-sm text-gray-700">
+      I declare that all the information provided above is true to the best of my knowledge.
+    </span>
+  </div>
+</div>

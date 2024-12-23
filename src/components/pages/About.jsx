@@ -4,40 +4,41 @@ import { UserIcon } from '@heroicons/react/24/solid'
 const About = () => {
     const teamMembers = [
         {
-            name: 'kuldeep patel',
+            name: 'Anurag bharadwaj',
             role: 'Founder & CEO',
             icon: UserIcon,
-            bio: 'Passionate about bringing people together through events.'
+            bio: 'Passionate about connecting students with career opportunities.'
         },
         {
-            name: 'Tanvi Mehta',
+            name: 'Monal Yadav',
             role: 'Lead Developer',
             icon: UserIcon,
-            bio: 'Tech enthusiast in web development.'
+            bio: 'Tech enthusiast focused on building innovative solutions.'
         },
         {
-            name: 'Riya Soni',
+            name: 'Anjali gavel',
             role: 'Marketing Manager',
             icon: UserIcon,
-            bio: 'Our Mrketing Manger with greator presetation skills.'
+            bio: 'Expert in campus relations and student engagement.'
         },
         {
-            name: 'Lokesh Patel',
-            role: 'Finance Manager',
+            name: 'Ishika patel',
+            role: 'Operations Manager',
             icon: UserIcon,
-            bio: 'Finance Manager who audit and manage finance.'
+            bio: 'Skilled in managing placement processes and student support.'
         }
     ]
 
     return (
         <main className="flex min-h-screen flex-col items-center px-6 py-12 bg-white">
             {/* Hero Section */}
-            <section className="bg-primary-50  bg-cover bg-center py-10 ">
-                <h1 className=" text-3xl font-bold text-center ">About Evently</h1>
+            <section className="bg-primary-50 bg-cover bg-center py-10">
+                <h1 className="text-3xl font-bold text-center">About Placemenia</h1>
             </section>
-            <p className="text-gray-600 text-lg mb-8 text-center max-w-4xl ">
-                Evently is your premier platform for discovering, creating, and managing events that matter.
-                We believe in bringing people together and creating memorable experiences.
+            <p className="text-gray-600 text-lg mb-8 text-center max-w-4xl">
+                Placemenia is your comprehensive college placement portal, connecting talented students
+                with leading employers. We streamline the campus recruitment process and help students
+                launch their careers.
             </p>
 
             {/* Mission Section */}
@@ -45,9 +46,9 @@ const About = () => {
                 <h2 className="text-3xl font-semibold mb-6 text-center">Our Mission</h2>
                 <div className="bg-gray-50 p-8 rounded-lg">
                     <p className="text-gray-700">
-                        Our mission is to simplify event management and enhance the way people connect through events.
-                        Whether you're organizing a small meetup or a large conference, Evently provides the tools
-                        you need to succeed.
+                        Our mission is to bridge the gap between academic excellence and professional opportunities.
+                        We empower students with the tools and resources they need to secure their dream jobs,
+                        while helping companies find the perfect talent for their organizations.
                     </p>
                 </div>
             </section>

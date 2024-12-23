@@ -4,64 +4,101 @@ import { useAuth } from '../../../context/AuthContext';
 
 const StudentForm = () => {
   const { user } = useAuth();
-
   const [formData, setFormData] = useState({
     studentId: user.userId,
     name: '',
     email: '',
     dateOfBirth: '',
     phoneNumber: '',
-    skills: '',
+    skills: [],
     education: {
       tenth: { percentage: '', board: '', yearOfPassing: '' },
-      twelfth: { percentage: '', stream:'', board: '', yearOfPassing: '' },
+      twelfth: { percentage: '', stream: '', board: '', yearOfPassing: '' },
       ug: { isCompleted: false, cgpa: '', university: '', course: '', yearOfPassing: '' },
       pg: { isCompleted: false, cgpa: '', university: '', course: '', yearOfPassing: '' },
     },
     resume: null,
+    placementStatus: false,
+    applications: [],
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-  
-    setFormData((prev) => {
-      const keys = name.split('.'); // Handle nested properties
-      let newState = { ...prev };
-  
-      let ref = newState; 
-      keys.slice(0, -1).forEach((key) => {
-        ref[key] = { ...ref[key] }; // Ensure immutability
-        ref = ref[key];
-      });
-  
-      ref[keys[keys.length - 1]] = value; // Update the property
-      return newState;
-    });
+    const { name, value, type, checked, files } = e.target;
+    if (name.includes('.')) {
+      const keys = name.split('.');
+      setFormData((prev) => ({
+        ...prev,
+        [keys[0]]: {
+          ...prev[keys[0]],
+          [keys[1]]: value,
+        },
+      }));
+    } else if (type === 'checkbox') {
+      setFormData((prev) => ({ ...prev, [name]: checked }));
+    } else if (type === 'file') {
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  
+  const validateForm = () => {
+    const { name, email, dateOfBirth, phoneNumber, education } = formData;
+    if (!name || !email || !dateOfBirth || !phoneNumber) {
+      return 'All personal information fields are required.';
+    }
+    if (!education.tenth.percentage || !education.tenth.board || !education.tenth.yearOfPassing) {
+      return 'All 10th details are required.';
+    }
+    if (!education.twelfth.percentage || !education.twelfth.stream || !education.twelfth.board || !education.twelfth.yearOfPassing) {
+      return 'All 12th details are required.';
+    }
+    return null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
-  console.log(formData);
+
+    const validationError = validateForm();
+    if (validationError) {
+      setSubmitError(validationError);
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:3000/api/student/create', formData, {
-        headers: { 'Content-Type': 'application/json' },
+      const formDataCopy = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === 'resume') {
+          formDataCopy.append(key, value);
+        } else if (typeof value === 'object') {
+          formDataCopy.append(key, JSON.stringify(value));
+        } else {
+          formDataCopy.append(key, value);
+        }
       });
-  
-      alert('Form submitted successfully!');
+
+      const response = await axios.post('/api/students', formDataCopy, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (response.status === 200) {
+        alert('Form submitted successfully!');
+        setFormData({ ...initialFormData }); // Reset form to initial state
+      }
     } catch (error) {
-      setSubmitError(error.response?.data?.message || 'Something went wrong!');
+      console.error('Error submitting form:', error);
+      setSubmitError('Failed to submit the form. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <div className="container mx-auto px-4 py-8">
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8">
@@ -101,7 +138,7 @@ const StudentForm = () => {
             </div>
 
             {/* Gender and DOB */}
-          
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div>
               <label className="block text-sm font-medium mb-1">Gender *</label>
               <select name="gender" value={formData.gender} onChange={handleChange} 
@@ -117,7 +154,7 @@ const StudentForm = () => {
               <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} 
                 className="w-full border rounded-md px-3 py-2" required />
             </div>
-        
+          </div>
 
     {/* phone number */}
             <div>
@@ -149,10 +186,21 @@ const StudentForm = () => {
         
           <h2 className='text-lg font-semibold mb-4'>10th Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-          <div>
+           
+            <div>
+              <label className="block text-sm font-medium mb-1">10th Percentage *</label>
+              <input
+                type="number"
+                name="education.tenth.percentage"
+                value={formData.education.tenth.percentage}
+                onChange={handleChange}
+                className="w-full border rounded-md px-3 py-2"
+                required
+              />
+            </div>
+            <div>
               <label className="block text-sm font-medium mb-1">Board</label>
-              <select name="education.tenth.board" value={formData.education.tenth.board} onChange={handleChange} 
+              <select name="tenthBoard" value={formData.tenthBoard} onChange={handleChange} 
                 className="w-full border rounded-md px-3 py-2" required>
                 <option value="">Select Board</option>
                 <option value="cgbase">CGBASE</option>
@@ -161,32 +209,15 @@ const StudentForm = () => {
                 <option value="upmps">UPMPS</option> 
               </select>
             </div>
-           
-            <div>
-              <label className="block text-sm font-medium mb-1">10th Percentage *</label>
-              <input
-                 type="number"                 
-                 min="0"
-                 max="100"              
-                name="education.tenth.percentage"
-                value={formData.education.tenth.percentage}
-                onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2"
-                required
-              />
-            </div>
-           
             <div>
               <label className="block text-sm font-medium mb-1">10th Year of Passing *</label>
               <input
-                 type='date'                 
-                 min="1950-01-01" 
-                 max="2050-12-31"   
+                type="number"
                 name="education.tenth.yearOfPassing"
                 value={formData.education.tenth.yearOfPassing}
-                onChange={handleChange}               
+                onChange={handleChange}
+                className="w-full border rounded-md px-3 py-2"
                 required
-                 className="w-full border rounded-md px-3 py-2"
               />
             </div>
           </div>
@@ -196,53 +227,45 @@ const StudentForm = () => {
           <section className='my-4 border-4 rounded-lg p-4'>
           <h2 className='text-lg font-semibold mb-4'>12th Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div>
-              <label className="block text-sm font-medium mb-1">12th Board *</label>
-              <select name="education.twelfth.board" value={formData.education.twelfth.board} onChange={handleChange} 
-                className="w-full border rounded-md px-3 py-2" required>
-               
-                <option value="">Select Board</option>
-                <option value="cgbase">CGBASE</option>
-                <option value="cbse">CBSE</option>
-                <option value="bseb">BSEB</option>
-                <option value="upmps">UPMPS</option>
-              </select>
-            </div>
-
             <div>
-              <label className="block text-sm font-medium mb-1">12th Stream *</label>
-              <select name="education.twelfth.stream" value={formData.education.twelfth.stream} onChange={handleChange} 
+              <label className="block text-sm font-medium mb-1">12th Percentage *</label>
+              <input
+                type="number"
+                name="education.twelfth.percentage"
+                value={formData.education.twelfth.percentage}
+                onChange={handleChange}
+                className="w-full border rounded-md px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">12th Stream *</label>            
+            
+              <select name="twelfthSubject" value={formData.education.twelfth.stream} onChange={handleChange} 
                 className="w-full border rounded-md px-3 py-2" required>
                 <option value="">Select Subject</option>
-                <option value="science">Science</option>
+                <option value="bio">Bio</option>
                 <option value="math">Math</option>
                 <option value="commerse">Commerse</option>
                 <option value="art">Art</option> 
               </select>
           
             </div>
-
             <div>
-              <label className="block text-sm font-medium mb-1">12th Percentage *</label>
+              <label className="block text-sm font-medium mb-1">12th Board *</label>
               <input
-                  type="number"                 
-                  min="00"
-                  max="100"
-                name="education.twelfth.percentage"
-                value={formData.education.twelfth.percentage}
-                onChange={handleChange}               
-                required
+                type="text"
+                name="education.twelfth.board"
+                value={formData.education.twelfth.board}
+                onChange={handleChange}
                 className="w-full border rounded-md px-3 py-2"
+                required
               />
             </div>
-           
-            
             <div>
               <label className="block text-sm font-medium mb-1">12th Year of Passing *</label>
               <input
-                 type='date'                 
-                  min="1950-01-01" 
-                  max="2050-12-31"               
+                type="number"
                 name="education.twelfth.yearOfPassing"
                 value={formData.education.twelfth.yearOfPassing}                
                 onChange={handleChange}
@@ -256,29 +279,11 @@ const StudentForm = () => {
          {/* Undergraduate (UG) Details */}
          <section className='my-4 border-4 rounded-lg p-4'>
            <h2 className='text-lg font-semibold mb-4'>Under Graduation Details</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">          
-
-            <div>
-               <label className="block text-sm font-medium mb-1">UG Course</label>
-                           
-              <select name="education.ug.course" value={formData.education.ug.course} onChange={handleChange} 
-                className="w-full border rounded-md px-3 py-2" required>
-                <option value="">Select Program</option>
-                <option value="btech">B.Tech</option>
-                <option value="bsc">BSC</option>
-                <option value="bca">BCA</option>
-                <option value="bba">BBA</option>
-              </select>
-            
-             </div>          
-            
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
              <div>
                <label className="block text-sm font-medium mb-1">UG CGPA</label>
                <input
-                 type="text"                 
-                 min="0"
-                 max="10"
-                
+                 type="number"
                  name="education.ug.cgpa"
                  value={formData.education.ug.cgpa}
                  onChange={handleChange}
@@ -295,22 +300,31 @@ const StudentForm = () => {
                  className="w-full border rounded-md px-3 py-2"
                />
              </div>
+              <div>
+               <label className="block text-sm font-medium mb-1">UG Course</label>
+               <div>
+              
+              <select name="graduation Degree" value={formData.education.ug.course} onChange={handleChange} 
+                className="w-full border rounded-md px-3 py-2" required>
+                <option value="">Select Program</option>
+                <option value="btech">B.Tech</option>
+                <option value="bsc">BSC</option>
+                <option value="bca">BCA</option>
+                <option value="bba">BBA</option>
+              </select>
             
+             </div>
              <div>
                <label className="block text-sm font-medium mb-1">UG Year of Passing</label>
                <input
-                 type='date'                 
-                 min="1950-01-01" 
-                 max="2050-12-31"   
+                 type="number"
                  name="education.ug.yearOfPassing"
                  value={formData.education.ug.yearOfPassing}
                  onChange={handleChange}
                  className="w-full border rounded-md px-3 py-2"
                />
              </div>
-         
-       
-     
+           </div>
         </div>
          </section>
 
@@ -323,24 +337,11 @@ const StudentForm = () => {
         <h2 className='text-lg font-semibold mb-4'>Post Graduation Details</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
        
-
-        <div>
-            <label className="block text-sm font-medium mb-1">PG Course</label>
-            <select name="education.pg.course" value={formData.education.pg.course} onChange={handleChange} 
-                className="w-full border rounded-md px-3 py-2" required>
-                <option value="">Select Program</option>
-                <option value="btech">M.Tech</option>
-                <option value="mca">MCA</option>
-                <option value="mba">MBA</option>
-              </select>
-          </div>
           <div>
             <label className="block text-sm font-medium mb-1">PG CGPA</label>
             <input
-               type="text"                 
-               min="0"
-               max="10"               
-               name="education.pg.cgpa"
+              type="number"
+              name="education.pg.cgpa"
               value={formData.education.pg.cgpa}
               onChange={handleChange}
               className="w-full border rounded-md px-3 py-2"
@@ -356,13 +357,20 @@ const StudentForm = () => {
               className="w-full border rounded-md px-3 py-2"
             />
           </div>
-         
+          <div>
+            <label className="block text-sm font-medium mb-1">PG Course</label>
+            <select name="program" value={formData.education.pg.course} onChange={handleChange} 
+                className="w-full border rounded-md px-3 py-2" required>
+                <option value="">Select Program</option>
+                <option value="btech">B.Tech</option>
+                <option value="mca">MCA</option>
+                <option value="mba">MBA</option>
+              </select>
+          </div>
           <div>
             <label className="block text-sm font-medium mb-1">PG Year of Passing</label>
             <input
-             type='date'                 
-             min="1950-01-01" 
-             max="2050-12-31"   
+              type="number"
               name="education.pg.yearOfPassing"
               value={formData.education.pg.yearOfPassing}
               onChange={handleChange}
@@ -373,20 +381,7 @@ const StudentForm = () => {
         </section>
       </section>
 
-      {/* Skills */}
-
-      <section className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">Skills</h2>
-        <input
-          type="text"
-          name="skills"
-          placeholder='Enter your skills'
-          onChange={handleChange}
-          className="w-full border rounded-md px-3 py-2"
-        />
-      </section>
-
-      {/* Resume url */}
+      {/* Resume Upload */}
       <section className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">Add Resume</h2>
         <input
@@ -414,8 +409,7 @@ const StudentForm = () => {
       </form>
     </div>
     
-  );
+);
 };
 
 export default StudentForm;
-

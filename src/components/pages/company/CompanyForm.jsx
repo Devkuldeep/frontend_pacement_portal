@@ -1,7 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import { useAuth } from "../../../context/AuthContext";
 
 const CompanyRegistrationForm = () => {
+  const { user } = useAuth();
+   const userId = user.userId;
+
   const [formData, setFormData] = useState({
+
+    companyId: userId,
     companyName: "",
     contactPerson: "",
     contactEmail: "",
@@ -10,7 +17,6 @@ const CompanyRegistrationForm = () => {
     companyType: "",
     industryType: "",
     companyAddress: "",
-    numberOfEmployees: "",
     companyDescription: "",
     internshipAvailability: false,
   
@@ -34,11 +40,7 @@ const CompanyRegistrationForm = () => {
     if (!formData.companyType) newErrors.companyType = "Company Type is required";
     if (!formData.industryType) newErrors.industryType = "Industry Type is required";
     if (!formData.companyAddress) newErrors.companyAddress = "Company Address is required";
-    if (!formData.numberOfEmployees || formData.numberOfEmployees <= 0) {
-      newErrors.numberOfEmployees = "Valid Number of Employees is required";
-    }
     if (!formData.companyDescription) newErrors.companyDescription = "Company Description is required";
-    if (!formData.jobPositions) newErrors.jobPositions = "Job Positions are required";
     return newErrors;
   };
 
@@ -47,12 +49,24 @@ const CompanyRegistrationForm = () => {
     setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
     if (Object.keys(formErrors).length === 0) {
-      console.log(formData);
-      alert("Form Submitted Successfully!");
+
+    try {
+      console.log('Form submitted:', formData);
+      await axios.post('http://localhost:3000/api/company/create', formData)
+        .then(response => {
+          console.log('Form submitted successfully:', response.data);
+          alert("Form Submitted Successfully!");     
+        
+    })
+   
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
+     
     } else {
       setErrors(formErrors);
     }
@@ -149,8 +163,7 @@ const CompanyRegistrationForm = () => {
           )}
         </div>
 
-        {/* Other fields (similar structure for validations) */}
-        {/* Repeat the same pattern for remaining fields like Company Type, Address, etc. */}
+     
         <div>
   <label className="block font-medium">Company Type</label>
   <select
@@ -161,10 +174,14 @@ const CompanyRegistrationForm = () => {
       errors.companyType ? "border-red-500" : "border-gray-300"
     }`}
   >
+  
     <option value="">Select Type</option>
-    <option value="startup">Startup</option>
-    <option value="mnc">MNC</option>
-    <option value="corporate">Corporate</option>
+    <option value="STARTUP">Startup</option>
+    <option value="MNC">MNC</option>
+    <option value="SME">Corporate</option>
+    <option value="GOVERNMENT">Government</option>
+    <option value="NGO">NGO</option>
+    <option value="OTHERS">Others</option>
   </select>
   {errors.companyType && (
     <p className="text-sm text-red-500">{errors.companyType}</p>
@@ -183,10 +200,13 @@ const CompanyRegistrationForm = () => {
     }`}
   >
     <option value="">Select Industry</option>
-    <option value="it">Information Technology</option>
-    <option value="finance">Finance</option>
-    <option value="healthcare">Healthcare</option>
-    <option value="manufacturing">Manufacturing</option>
+    <option value="IT">Information Technology</option>
+    <option value="FINANCE">Finance</option>
+    <option value="HEALTHCARE">Healthcare</option>
+    <option value="EDUCATION">Education</option>
+    <option value="MARKETING">Marketing</option>
+    <option value="OTHERS">Others</option>
+
   </select>
   {errors.industryType && (
     <p className="text-sm text-red-500">{errors.industryType}</p>
@@ -210,22 +230,7 @@ const CompanyRegistrationForm = () => {
   )}
 </div>
 
-{/* Number of Employees */}
-<div>
-  <label className="block font-medium">Number of Employees</label>
-  <input
-    type="number"
-    name="numberOfEmployees"
-    value={formData.numberOfEmployees}
-    onChange={handleChange}
-    className={`w-full px-4 py-2 border rounded-md ${
-      errors.numberOfEmployees ? "border-red-500" : "border-gray-300"
-    }`}
-  />
-  {errors.numberOfEmployees && (
-    <p className="text-sm text-red-500">{errors.numberOfEmployees}</p>
-  )}
-</div>
+
 
 {/* Company Description */}
 <div className="col-span-2">
@@ -243,9 +248,6 @@ const CompanyRegistrationForm = () => {
     <p className="text-sm text-red-500">{errors.companyDescription}</p>
   )}
 </div>
-
-
-
 
 {/* Internship Availability */}
 <div className="col-span-2">

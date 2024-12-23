@@ -6,7 +6,6 @@ const Services = () => {
         {
             title: "EMPLOYERS",
             subtitle: "End-to-end virtual campus hiring",
-            description: "Complete automation, right from outreach to 24,000 campuses, engagement, assessments, virtual interviews to industry benchmarking and analytics.",
             buttonText: "For Employers",
             href: "/company/registration",
             icon: "👔",
@@ -14,15 +13,13 @@ const Services = () => {
         {
             title: "COLLEGES",
             subtitle: "Digitize & automate placements online",
-            description: "Effortlessly streamline your campus placement process by accessing the latest job openings, managing student data, and securing interviews.",
             buttonText: "For Colleges",
-            href: "/college/registration",
+            href: "/college/dashboard",
             icon: "🎓",
         },
         {
             title: "STUDENTS",
             subtitle: "Learn, prepare & apply to jobs",
-            description: "Discover new opportunities, learn and practice on the go, prepare better for interviews.",
             buttonText: "For Students",
             href: "/student/registration",
             icon: "📚",
@@ -54,7 +51,7 @@ const Card = ({ title, subtitle, description, buttonText, icon, href }) => {
                 <div className="space-y-3">
                     <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
                     <h4 className="text-lg font-medium text-blue-600">{subtitle}</h4>
-                    <p className="text-gray-600 leading-relaxed">{description}</p>
+                 
                 </div>
                 <Link 
                     to={href}

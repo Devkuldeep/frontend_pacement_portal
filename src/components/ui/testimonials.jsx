@@ -23,7 +23,7 @@ const Testimonials = () => {
               {/* Star icons here */}
             </div>
 
-            <p className="mt-0.5 text-lg font-medium text-gray-900">Paul Starr, Graduate</p>
+            <p className="mt-0.5 text-lg font-medium text-gray-900">Monal</p>
           </div>
         </div>
 
@@ -35,8 +35,8 @@ const Testimonials = () => {
       <blockquote className="rounded-lg bg-gray-50 p-6 shadow-sm sm:p-8">
         <div className="flex items-center gap-4">
           <img
-            alt="Student 2"
-            src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80"
+            alt="anurag"
+            src=""
             className="size-14 rounded-full object-cover"
           />
 
@@ -45,7 +45,7 @@ const Testimonials = () => {
               {/* Star icons here */}
             </div>
 
-            <p className="mt-0.5 text-lg font-medium text-gray-900">Rachel Thomas, Software Engineer</p>
+            <p className="mt-0.5 text-lg font-medium text-gray-900">Anurag, Software Engineer</p>
           </div>
         </div>
 
@@ -57,8 +57,8 @@ const Testimonials = () => {
       <blockquote className="rounded-lg bg-gray-50 p-6 shadow-sm sm:p-8">
         <div className="flex items-center gap-4">
           <img
-            alt="Recruiter 1"
-            src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80"
+            alt="Recruiter"
+            src=""
             className="size-14 rounded-full object-cover"
           />
 
@@ -67,7 +67,7 @@ const Testimonials = () => {
               {/* Star icons here */}
             </div>
 
-            <p className="mt-0.5 text-lg font-medium text-gray-900">Anna Peterson, HR Manager</p>
+            <p className="mt-0.5 text-lg font-medium text-gray-900">Anjali, HR Manager</p>
           </div>
         </div>
 

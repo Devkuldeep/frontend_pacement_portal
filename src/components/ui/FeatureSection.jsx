@@ -48,12 +48,9 @@ export default function Features() {
             </div>
           </div>
           <div className="relative lg:pt-8">
-            <div className="hidden lg:block">
-              <div className="absolute inset-0 transform-gpu -translate-x-1/2 -translate-y-1/2 rotate-12 bg-gradient-to-br from-[#ff80b5] to-[#9089fc] rounded-md w-96 h-96" />
-              <div className="absolute inset-0 transform-gpu -translate-x-1/2 -translate-y-1/2 rotate-12 bg-gradient-to-br from-[#ff80b5] to-[#9089fc] rounded-md w-96 h-96" />
-            </div>
+            
             <div className="relative bg-gradient-to-br from-[#ff80b5] to-[#9089fc] rounded-md p-8">
-              <img src="" alt="Feature" className="w-full" />
+              <img src="/img.jpg" alt="Feature" className="w-full" />
             </div>
           </div>
         </div>

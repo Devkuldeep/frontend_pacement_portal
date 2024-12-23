@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '../../../context/AuthContext';
+import axios from 'axios';
 
 const Profile = () => {
-    const studentId = "6751b9d6e9e951cd5945a1fb";
+    const { user } = useAuth();
+    const studentId = user.userId;
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -9,11 +12,20 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/student/${studentId}`);
-                if (!response.ok) throw new Error('Failed to fetch profile data');
-                const data = await response.json();
-                setProfile(data);
+                const response = await axios.get(`http://localhost:3000/api/student/getOne/${studentId}`, {
+                    withCredentials: true
+                });
+
+                if (response.data.success === false) {
+                    window.location.href = 'http://localhost:5173/student/registration';
+                    return;
+                }
+                setProfile(response.data.student);
             } catch (err) {
+                if (err.response.data.success === false) {
+                    window.location.href = 'http://localhost:5173/student/registration';
+                    return;
+                }
                 setError(err.message);
             } finally {
                 setLoading(false);
@@ -26,67 +38,90 @@ const Profile = () => {
     if (error) return <div className="text-red-500 text-center p-4">Error: {error}</div>;
 
     return (
-        <div className="max-w-6xl mx-auto p-6 space-y-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">{profile?.name}'s Profile</h1>
+        <div className="max-w-6xl mx-auto p-6 space-y-8 font-sans">
+            <h1 className="text-4xl font-extrabold text-gray-800 mb-8 text-center uppercase">{profile?.name} Profile</h1>
 
-            {/* Profile Overview */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                    <p className="text-gray-700"><span className="font-semibold">Email:</span> {profile?.email}</p>
-                    <p className="text-gray-700"><span className="font-semibold">Student ID:</span> {profile?.studentId}</p>
-                    <p className="text-gray-700"><span className="font-semibold">Department:</span> {profile?.department}</p>
-                    <p className="text-gray-700"><span className="font-semibold">Course:</span> {profile?.course}</p>
-                    <p className="text-gray-700"><span className="font-semibold">CGPA:</span> {profile?.cgpa}</p>
-                    <p className="text-gray-700"><span className="font-semibold">Phone:</span> {profile?.phoneNumber}</p>
-                    <p className="text-gray-700"><span className="font-semibold">LinkedIn:</span> 
-                        <a href={`https://${profile?.linkedin}`} className="text-blue-600 hover:text-blue-800 ml-1" target="_blank" rel="noopener noreferrer">{profile?.linkedin}</a>
-                    </p>
-                    <p className="text-gray-700"><span className="font-semibold">Resume:</span> 
-                        <a href={profile?.resume} className="text-blue-600 hover:text-blue-800 ml-1" target="_blank" rel="noopener noreferrer">Download Resume</a>
-                    </p>
-                </div>
-            </div>
+            <div className="grid gap-6">
 
-            {/* Skills */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-semibold mb-4">Skills</h2>
-                <div className="flex flex-wrap gap-2">
-                    {profile?.skills.map((skill, index) => (
-                        <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                            {skill}
-                        </span>
-                    ))}
-                </div>
-            </div>
-
-      
-
-            {/* Education */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-semibold mb-4">Education</h2>
-                <div className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <p className="text-gray-700"><span className="font-semibold">10th:</span> {profile?.education.tenth.percentage}% from {profile?.education.tenth.board} ({profile?.education.tenth.yearOfPassing})</p>
-                        <p className="text-gray-700"><span className="font-semibold">12th:</span> {profile?.education.twelfth.percentage}% from {profile?.education.twelfth.board} ({profile?.education.twelfth.yearOfPassing})</p>
-                        <p className="text-gray-700"><span className="font-semibold">UG:</span> {profile?.education.ug.cgpa} CGPA from {profile?.education.ug.university} ({profile?.education.ug.yearOfPassing})</p>
-                        <p className="text-gray-700"><span className="font-semibold">PG:</span> {profile?.education.pg.cgpa} CGPA from {profile?.education.pg.university} ({profile?.education.pg.yearOfPassing})</p>
+                <div className="bg-gray-100 p-6 shadow-lg rounded-lg">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4 uppercase">Personal Information</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-gray-600 uppercase">Name</p>
+                            <p className="text-gray-800 font-semibold uppercase">{profile?.name}</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-600 uppercase">Email</p>
+                            <p className="text-gray-800 font-semibold uppercase">{profile?.email}</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-600 uppercase">Phone</p>
+                            <p className="text-gray-800 font-semibold uppercase">{profile?.phoneNumber}</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-600 uppercase">Date of Birth</p>
+                            <p className="text-gray-800 font-semibold uppercase">{profile?.dateOfBirth}</p>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </div>        
 
-            {/* Placement Status */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-semibold mb-4">Placement Status</h2>
-                {profile?.placementStatus.isPlaced ? (
-                    <p className="text-green-600">
-                        Placed at <span className="font-medium">{profile?.placementStatus.company}</span> as a {profile?.placementStatus.jobRole} with a package of ₹{profile?.placementStatus.package}
-                    </p>
-                ) : (
-                    <p className="text-yellow-600">Not Placed Yet</p>
-                )}
-            </div>
+                <div className="bg-gray-100 p-6 shadow-lg rounded-lg">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4 uppercase">Educational Details</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-gray-600 uppercase font-bold text-lg">10th</p>
+                            <p className="text-gray-800 font-semibold uppercase">Board : {profile?.education?.tenth?.board}</p>
+                            <p className="text-gray-800 font-semibold uppercase">Percentage :  {profile?.education?.tenth?.percentage}</p>
+                            <p className="text-gray-800 font-semibold uppercase">Year Of passing :  {profile?.education?.tenth?.yearOfPassing}</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-600 uppercase font-bold text-lg">12th</p>
+                            <p className="text-gray-800 font-semibold uppercase">Board : {profile?.education?.twelfth?.board}</p>
+                            <p className="text-gray-800 font-semibold uppercase">Percentage : {profile?.education?.twelfth?.percentage}</p>
+                            <p className="text-gray-800 font-semibold uppercase">Year Of passing : {profile?.education?.twelfth?.yearOfPassing}</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-600 uppercase font-bold text-lg">Graduation</p>
+                            <p className="text-gray-800 font-semibold uppercase">Course :  {profile?.education?.ug?.course}</p>
+                            <p className="text-gray-800 font-semibold uppercase">Cgpa : {profile?.education?.ug?.cgpa}</p>
+                            <p className="text-gray-800 font-semibold uppercase">Year Of Passing : {profile?.education?.ug?.yearOfPassing}</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-600 uppercase font-bold text-lg">Post Graduation</p>
+                            <p className="text-gray-800 font-semibold uppercase">Course : {profile?.education?.pg?.course}</p>
+                            <p className="text-gray-800 font-semibold uppercase">Cgpa : {profile?.education?.pg?.cgpa}</p>
+                            <p className="text-gray-800 font-semibold uppercase">Year Of Passing : {profile?.education?.pg?.yearOfPassing}</p>
+                        </div>              
+                    </div>
+                </div> 
 
-            
+                <div className="bg-gray-100 p-6 shadow-lg rounded-lg">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4 uppercase">Skills</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>                           
+                            <p className="text-gray-800 font-semibold uppercase">{profile?.skills}</p>
+                        </div>                        
+                    </div>
+                </div>    
+                <div className="bg-gray-100 p-6 shadow-lg rounded-lg">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4 uppercase">Resume</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>                           
+                        {profile?.resume && (
+                            <a 
+                            href={profile.resume.startsWith('http') ? profile.resume : `https://${profile.resume}`} 
+                             target='_blank' 
+                             rel="noopener noreferrer" 
+                            className="text-gray-800 font-semibold underline uppercase"
+                          >
+                          View Resume
+                         </a>
+                           )}
+                        </div>                        
+                    </div>
+                </div>  
+
+            </div>
         </div>
     );
 };
