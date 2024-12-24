@@ -1,29 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 const CollegeProfile = () => {
-    const collegeId = "12345"; // Replace with actual college ID
-    const [college, setCollege] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const demoCollege = {
+        collegeName: "Rungta College of Engineering and Technology",
+        collegeCode: "DC123",
+        address: "123 Bhilai,Chhattisgarh",
+        city: "Bhilai",
+        state: "Chhattisgarh",
+        website: "www.rugta.ac.com",
+        establishedYear: 2000,
+        placementHead: {
+            name: "Ramesh Kumar",
+            email: "ramesh@democollege.com",
+            phone: "123-456-7890"
+        },
+        departments: ["Computer Science", "Mechanical Engineering", "Electrical Engineering"],
+        placementStats: {
+            totalStudents: 500,
+            studentsPlaced: 450,
+            avgPackage: 6,
+            highestPackage: 12
+        }
+    };
 
-    useEffect(() => {
-        const fetchCollege = async () => {
-            try {
-                const response = await fetch(`http://localhost:8000/api/college/${collegeId}`);
-                if (!response.ok) throw new Error('Failed to fetch college data');
-                const data = await response.json();
-                setCollege(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchCollege();
-    }, [collegeId]);
-
-    if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
-    if (error) return <div className="text-red-500 text-center p-4">Error: {error}</div>;
+    const [college] = useState(demoCollege);
 
     return (
         <div className="max-w-6xl mx-auto p-6 space-y-8">
